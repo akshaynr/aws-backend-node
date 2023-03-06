@@ -2,16 +2,11 @@
 
 import { mockAsyncCall } from '../mocks/async.mock';
 import { productsMockData } from '../mocks/products.mock';
+import { formatResponse } from '../util/commonUtility'
+import { STATUS_CODES } from '../constants';;
 
 export const getProductsList = async (event) => {
+    console.log('[Get Products List] request, event:', event);
     const productsData = await mockAsyncCall(productsMockData);
-    const headers = {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Credentials': true,
-    };
-    return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify(productsData)
-    };
+    return formatResponse(STATUS_CODES.OK, productsData);
 };

@@ -2,14 +2,11 @@
 
 import { mockAsyncCall } from '../mocks/async.mock';
 import { productsMockData } from '../mocks/products.mock';
+import { formatResponse } from '../util/commonUtility'
+import { STATUS_CODES } from '../constants';
 
 export const getProductsById = async (event) => {
     console.log('[Get Products List By ID] request, event:', event);
-
-    const headers = {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Credentials': true,
-    };
 
     const productsData = await mockAsyncCall(productsMockData);
     let productId = null;
@@ -17,26 +14,14 @@ export const getProductsById = async (event) => {
     if(event && event.pathParameters && event.pathParameters.productId != null){
         productId = event.pathParameters.productId;
     } else{
-        return {
-            statusCode: 400,
-            headers,
-            body: JSON.stringify({ message: "Invalid Product Id" }),
-        }
+        return formatResponse(STATUS_CODES.BAD_REQUEST, { message: "Invalid Product Id" });
     };
 
     const product = productsData.find((element) => element.id == productId);
 
     if(product){
-        return {
-            statusCode: 200,
-            headers,
-            body: JSON.stringify(product),
-        }
+        return formatResponse(STATUS_CODES.OK, product);
     } else{
-        return {
-            statusCode: 404,
-            headers,
-            body: JSON.stringify({ message: "Product Not Found" }),
-        }
+        return formatResponse(STATUS_CODES.NOT_FOUND, { message: "Product Not Found" });
     }
 };
