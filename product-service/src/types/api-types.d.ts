@@ -5,3 +5,11 @@ export interface Product {
     price: number,
     title: string
 }
+
+export interface ProductRequest {
+    count: number,
+    description: string,
+    price: number,
+    title: string
+}
+

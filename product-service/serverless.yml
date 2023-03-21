@@ -20,6 +20,8 @@ service: product-service
 # Check out our docs for more details
 frameworkVersion: '3'
 
+useDotenv: true
+
 plugins:
   - serverless-auto-swagger
   - serverless-webpack
@@ -50,8 +52,15 @@ provider:
 #                - "/*"
 
 # you can define service wide environment variables here
-#  environment:
-#    variable1: value1
+  environment:
+    PRODUCTS_TABLE: ${env:PRODUCTS_TABLE}
+    STOCKS_TABLE: ${env:STOCKS_TABLE}
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:*
+      Resource: '*'
 
 # you can add packaging information here
 #package:
@@ -74,6 +83,9 @@ functions:
             200: {
               description: 'Products Data',
               bodyType: 'Product',
+            },
+            500: {
+              description: 'Internal Server Error'
             }
           }
   getProductsById:
@@ -94,5 +106,29 @@ functions:
             },
             404: {
               description: 'Product Not Found'
+            },
+            500: {
+              description: 'Internal Server Error'
+            }
+          }
+  createProduct:
+    handler: handler.createProduct
+    events:
+     - httpApi:
+         path: /products
+         method: post
+         cors: true
+         swaggerTags: ['Product']
+         bodyType: 'ProductRequest'
+         responseData: {
+            201: {
+              description: 'Products Data',
+              bodyType: 'Product',
+            },
+            400: {
+              description: 'Invalid Product Data',
+            },
+            500: {
+              description: 'Internal Server Error'
             }
           }
