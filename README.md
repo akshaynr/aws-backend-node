@@ -16,3 +16,10 @@ SWAGGER documentation is created for Product Service
 Lambda handlers are covered by basic UNIT tests (NO infrastructure logic is needed to be covered)
 Lambda handlers (getProductsList, getProductsById) code is written not in 1 single module (file) and separated in codebase.
 Main error scenarios are handled by API ("Product not found" error). Also Invalid Product ID is taken care
+
+
+Import Service
+
+GET - https://e9xyxn31if.execute-api.eu-west-1.amazonaws.com/dev/import
+GET - https://l3ivbfh22k.execute-api.eu-west-1.amazonaws.com/swagger
+GET - https://l3ivbfh22k.execute-api.eu-west-1.amazonaws.com/swagger.json

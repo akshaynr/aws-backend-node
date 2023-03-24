@@ -1,0 +1,26 @@
+{
+  "name": "import-service",
+  "version": "1.0.0",
+  "description": "Import Service",
+  "main": "handler.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "Akshay Raskar",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/preset-env": "^7.20.2",
+    "aws-sdk-mock": "^5.8.0",
+    "babel-jest": "^29.5.0",
+    "babel-loader": "^9.1.2",
+    "jest": "^29.5.0",
+    "serverless-auto-swagger": "^2.12.0",
+    "serverless-offline": "^12.0.4",
+    "serverless-webpack": "^5.11.0",
+    "webpack": "^5.76.2"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.1340.0",
+    "csv-parser": "^3.0.0"
+  }
+}
