@@ -8,3 +8,5 @@ jspm_packages
 swagger
 
 .babelrc
+
+.DS_Store
