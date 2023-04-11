@@ -55,11 +55,17 @@ provider:
   environment:
     PRODUCTS_TABLE: ${env:PRODUCTS_TABLE}
     STOCKS_TABLE: ${env:STOCKS_TABLE}
+    SQS_QUEUE: ${env:SQS_QUEUE}
+    SNS_TOPIC: ${env:SNS_TOPIC}
+    SNS_ARN:
+      Ref: CreateProductTopic
 
   iamRoleStatements:
     - Effect: Allow
       Action:
         - dynamodb:*
+        - sqs:*
+        - sns:*
       Resource: '*'
 
 # you can add packaging information here
@@ -132,3 +138,43 @@ functions:
               description: 'Internal Server Error'
             }
           }
+  catalogBatchProcess:
+    handler: handler.catalogBatchProcess
+    events:
+      - sqs:
+          batchSize: 5
+          arn:
+            Fn::GetAtt:
+              - CatalogItemsQueue
+              - Arn
+
+resources:
+  Resources:
+    CatalogItemsQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        QueueName: ${env:SQS_QUEUE}
+
+    CreateProductTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: ${env:SNS_TOPIC}
+
+    CreateProductEmailSubscription:
+      Type: AWS::SNS::Subscription
+      Properties:
+        Protocol: email
+        TopicArn:
+          Ref: CreateProductTopic
+        Endpoint: anr241@gmail.com
+        FilterPolicy: { price: [{ numeric: ["<=", 200] }] }
+
+    CreateProductEmailSubscriptionAlternate:
+      Type: AWS::SNS::Subscription
+      Properties:
+        Protocol: email
+        TopicArn:
+          Ref: CreateProductTopic
+        Endpoint: akshay_raskar@epam.com
+        FilterPolicy: { price: [{ numeric: [">", 200] }] }
+
