@@ -57,6 +57,8 @@ provider:
   environment:
     BUCKET_NAME: ${env:BUCKET_NAME}
     BUCKET_REGION: ${env:BUCKET_REGION}
+    SQS_QUEUE: ${env:SQS_QUEUE}
+    SQS_QUEUE_URL: https://sqs.${aws:region}.amazonaws.com/${aws:accountId}/${env:SQS_QUEUE}
 
   iamRoleStatements:
     - Effect: Allow
@@ -69,6 +71,11 @@ provider:
         - s3:*
       Resource:
         - arn:aws:s3:::${env:BUCKET_NAME}/*
+    - Effect: Allow
+      Action:
+        - sqs:*
+      Resource:
+        - arn:aws:sqs:${aws:region}:${aws:accountId}:${env:SQS_QUEUE}
 
 # you can add packaging information here
 #package:

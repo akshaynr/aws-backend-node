@@ -5,10 +5,10 @@ import { STATUS_CODES } from '../constants';
 import { AWS_BUCKET }  from '../config';
 
 const s3Bucket = new AWS.S3({ region: AWS_BUCKET.BUCKET_REGION });
+const sqs = new AWS.SQS();
 
 export const importFileParser = async (event) => {
     try{
-        console.log('Inside Parser', event);
         const productData = [];
         for (const record of event.Records) {
             const readable = s3Bucket.getObject({
@@ -18,7 +18,8 @@ export const importFileParser = async (event) => {
     
             for await (const chunk of readable) {
                 productData.push(chunk);
-                console.log('Data:', chunk);
+                
+                await sendMessageToQueue(chunk);
             }
     
            // Copy File from uploaded folder to parsed folder
@@ -41,5 +42,16 @@ export const importFileParser = async (event) => {
     } catch(error){
         console.log('[Error Import File Parser]', error);
         return formatResponse(error.statusCode || STATUS_CODES.INTERNAL_SERVER_ERROR, { message: error.message });
+    }
+}
+
+const sendMessageToQueue = async(data) => {
+    try{
+        await sqs.sendMessage({
+          QueueUrl: process.env.SQS_QUEUE_URL,
+          MessageBody: JSON.stringify(data),
+        }).promise();
+    } catch(error){
+        throw error;
     }
 }

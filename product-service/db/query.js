@@ -1,4 +1,4 @@
-import { getDynamoDBConnection } from './connect.js';
+import { getDynamoDBConnection } from '../util/awsUtility';
 import { InternalServerError }  from '../util/error';
 
 
@@ -54,4 +54,15 @@ const transactWrite = async(items) => {
     }
 }
 
-export { scan, query, create, transactWrite };
+const batchWrite = async(params) => {
+    try{
+        const result = await getDynamoDBConnection().batchWrite(params).promise();
+        console.log('Result Batch Transaction:', result);
+        return result;
+    } catch(error){
+        console.log(error);
+        throw new InternalServerError();
+    }
+}
+
+export { scan, query, create, transactWrite, batchWrite };
