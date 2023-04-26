@@ -11,7 +11,7 @@
 #
 # Happy Coding!
 
-service: import-service
+service: authorization-service
 # app and org for use with dashboard.serverless.com
 #app: your-app-name
 #org: your-org-name
@@ -23,9 +23,7 @@ frameworkVersion: '3'
 useDotenv: true
 
 plugins:
-  - serverless-auto-swagger
   - serverless-webpack
-  - serverless-offline
 
 provider:
   name: aws
@@ -55,28 +53,7 @@ provider:
 
 # you can define service wide environment variables here
   environment:
-    BUCKET_NAME: ${env:BUCKET_NAME}
-    BUCKET_REGION: ${env:BUCKET_REGION}
-    SQS_QUEUE: ${env:SQS_QUEUE}
-    SQS_QUEUE_URL: https://sqs.${aws:region}.amazonaws.com/${aws:accountId}/${env:SQS_QUEUE}
-    FRONTEND_URL: ${env:FRONTEND_URL}
-
-  iamRoleStatements:
-    - Effect: Allow
-      Action:
-        - s3:ListBucket
-      Resource:
-        - arn:aws:s3:::${env:BUCKET_NAME}
-    - Effect: Allow
-      Action:
-        - s3:*
-      Resource:
-        - arn:aws:s3:::${env:BUCKET_NAME}/*
-    - Effect: Allow
-      Action:
-        - sqs:*
-      Resource:
-        - arn:aws:sqs:${aws:region}:${aws:accountId}:${env:SQS_QUEUE}
+    akshaynr: ${env:akshaynr}
 
 # you can add packaging information here
 #package:
@@ -87,69 +64,8 @@ provider:
 #    - include-me-dir/**
 
 functions:
-  importProductsFile:
-    handler: handler.importProductsFile
-    events:
-      - http:
-          path: /import
-          method: get
-          cors:
-            origin:
-              - ${env:FRONTEND_URL}
-            headers:
-              - Content-Type
-              - X-Amz-Date
-              - Authorization
-              - X-Api-Key
-              - X-Amz-Security-Token
-              - X-Amz-User-Agent
-              - X-Amzn-Trace-Id
-              - pragma
-              - cache-control
-            allowCredentials: true
-          request:
-            parameters:
-              querystrings:
-                name: true
-          swaggerTags: ['File']
-          queryStringParameters: {
-            name: {
-              required: true,
-              type: 'string',
-              description: 'File Name'
-            }
-          }
-          responseData: {
-            200: {
-              description: 'File Data',
-              bodyType: 'File',
-            },
-            400: {
-              description: 'Invalid File Name',
-            },
-            401: {
-              description: 'Unauthorized',
-            },
-            403: {
-              description: 'Forbidden',
-            },
-            500: {
-              description: 'Internal Server Error'
-            }
-          }
-          authorizer:
-            arn: arn:aws:lambda:${aws:region}:${aws:accountId}:function:authorization-service-dev-basicAuthorizer
-            type: token
-            resultTtlInSeconds: 0
-  importFileParser:
-    handler: handler.importFileParser
-    events:
-      - s3:
-          bucket: ${env:BUCKET_NAME}
-          event: s3:ObjectCreated:*
-          rules:
-            - prefix: uploaded/
-          existing: true
+  basicAuthorizer:
+    handler: handler.basicAuthorizer
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
@@ -191,17 +107,12 @@ functions:
 #      variable2: value2
 
 # you can add CloudFormation resource templates here
-resources:
- Resources:
-   UnAuthorized:
-     Type: AWS::ApiGateway::GatewayResponse
-     Properties:
-        ResponseParameters: 
-          "gatewayresponse.header.Access-Control-Allow-Origin": "'*'"
-          "gatewayresponse.header.Access-Control-Allow-Headers": "'*'"
-        ResponseType: "DEFAULT_4XX"
-        RestApiId:
-          Ref: "ApiGatewayRestApi"
+#resources:
+#  Resources:
+#    NewResource:
+#      Type: AWS::S3::Bucket
+#      Properties:
+#        BucketName: my-new-bucket
 #  Outputs:
 #     NewOutput:
 #       Description: "Description for the output"

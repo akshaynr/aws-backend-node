@@ -8,8 +8,16 @@ export const STATUS_CODES = {
     INTERNAL_SERVER_ERROR: 500
 };
 
+export const USER_CREDENTIALS = {
+    USERNAME: 'akshaynr',
+    PASSWORD: process.env.akshaynr
+}
+
 export const ERROR_MESSAGE = {
     INTERNAL_SERVER_ERROR: 'Internal Server Error'
 }
 
-export const FRONTEND_URL = process.env.FRONTEND_URL;
+export const POLICY = {
+    ALLOW: 'Allow',
+    DENY: 'Deny'
+}
